@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Hello World!</title>
+    <meta http-equiv="Content-Security-Policy" content="script-src 'self' 'unsafe-inline';" />
+</head>
+<body style="background: white;">
+<h3>Diplomova praca</h3>
+<form>
+    <label>Insert scrapping URL:</label>
+    <input type="text" id="url" name="url">
+    <button id="send_url" type="submit">Send</button>
+</form>
+<p id="uri"></p>
+
+
+</body>
+<!--<script src="./bot.js"></script>-->
+<script>
+    document.querySelector('#send_url').addEventListener('click', function() {
+
+        let username = document.getElementById("url").value;
+
+        const {ipcRenderer} = require('electron')
+
+        // send username to main.js
+        ipcRenderer.send('asynchronous-message', username )
+
+        // receive message from main.js
+        ipcRenderer.on('asynchronous-reply', (event, arg) => {
+            console.log(arg)
+
+        })
+
+    });
+</script>
+</html>
