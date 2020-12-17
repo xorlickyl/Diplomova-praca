@@ -16,7 +16,6 @@
 
 
 </body>
-<!--<script src="./bot.js"></script>-->
 <script>
     document.querySelector('#send_url').addEventListener('click', function() {
 
@@ -29,6 +28,7 @@
 
         // receive message from main.js
         ipcRenderer.on('asynchronous-reply', (event, arg) => {
+            document.getElementById('uri').innerHTML=arg;
             console.log(arg)
 
         })

@@ -1,5 +1,5 @@
 const { app, BrowserWindow } = require('electron')
-const{bots} = require('bot');
+
 
 function createWindow () {
     const win = new BrowserWindow({
@@ -33,9 +33,9 @@ const {ipcMain} = require('electron')
 
 // receive message from index.html
 ipcMain.on('asynchronous-message', (event, arg) => {
-    bots.then(arg);
+
     console.log( arg );
 
     // send message to index.html
-    event.sender.send('asynchronous-reply', bot(arg) );
+    event.sender.send('asynchronous-reply', arg);
 });
