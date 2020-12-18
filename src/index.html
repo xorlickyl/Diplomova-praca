@@ -13,26 +13,18 @@
     <button id="send_url" type="submit">Send</button>
 </form>
 <p id="uri"></p>
-
-
 </body>
 <script>
     document.querySelector('#send_url').addEventListener('click', function() {
-
-        let username = document.getElementById("url").value;
-
+        let url = document.getElementById("url").value;
         const {ipcRenderer} = require('electron')
-
-        // send username to main.js
-        ipcRenderer.send('asynchronous-message', username )
-
+        // send to main.js
+        ipcRenderer.send('asynchronous-message', url )
         // receive message from main.js
-        ipcRenderer.on('asynchronous-reply', (event, arg) => {
-            document.getElementById('uri').innerHTML=arg;
-            console.log(arg)
-
-        })
-
+        //ipcRenderer.on('asynchronous-reply', (event, arg) => {
+            document.getElementById('uri').innerHTML=url;
+         //   console.log(arg)
+       // })
     });
 </script>
 </html>

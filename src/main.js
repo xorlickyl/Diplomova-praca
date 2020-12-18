@@ -37,5 +37,5 @@ ipcMain.on('asynchronous-message', (event, arg) => {
     console.log( arg );
 
     // send message to index.html
-    event.sender.send('asynchronous-reply', arg);
+   // event.sender.send('asynchronous-reply', arg);
 });
