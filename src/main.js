@@ -32,10 +32,13 @@ console.log('Server-side code running');
 const {ipcMain} = require('electron')
 
 // receive message from index.html
-ipcMain.on('asynchronous-message', (event, arg) => {
-
+ipcMain.on('url',function (event, arg) {
     console.log( arg );
-
+    var python = require('child_process').spawn('pyhton', ['./text_from_url.py',arg]);
+    python.stdout.on('data',(data)=>{
+        console.log("data: ",data);
+    });
+   // event.sender.send('finish',arg);
     // send message to index.html
    // event.sender.send('asynchronous-reply', arg);
 });
