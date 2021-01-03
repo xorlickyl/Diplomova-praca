@@ -65,9 +65,5 @@ ipcMain.on('url',function (event, arg) {
         console.log('Last Transaction has occured')
     });
     console.log(req);
-    //req.write(url,'utf-8');
     req.end();
-   // event.sender.send('finish',arg);
-    // send message to index.html
-   // event.sender.send('asynchronous-reply', arg);
 });
