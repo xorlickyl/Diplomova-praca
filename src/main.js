@@ -1,4 +1,4 @@
-const { app, BrowserWindow } = require('electron')
+const {net, app, BrowserWindow } = require('electron')
 
 
 function createWindow () {
@@ -34,10 +34,16 @@ const {ipcMain} = require('electron')
 // receive message from index.html
 ipcMain.on('url',function (event, arg) {
     console.log( arg );
-    var python = require('child_process').spawn('pyhton', ['./text_from_url.py',arg]);
-    python.stdout.on('data',(data)=>{
-        console.log("data: ",data);
+    const  req = net.request({
+        method:'GET',
+        protocol:'http:',
+        host:'127.0.0.1:5000',
+        path:'/elements'
     });
+    req.on('response',(response) => {
+    console.log(response.statusCode)}
+    );
+    req.setHeader('url',arg);
    // event.sender.send('finish',arg);
     // send message to index.html
    // event.sender.send('asynchronous-reply', arg);
