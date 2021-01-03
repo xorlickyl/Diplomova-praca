@@ -45,10 +45,8 @@ ipcMain.on('url',function (event, arg) {
     });
     req.on('response',(response) => {
         console.log(response.statusCode)
-        console.log(`HEADERS: ${JSON.stringify(response.headers)}`);
 
         response.on('data', (chunk) => {
-            console.log(`BODY: ${chunk}`)
             event.sender.send("finished",chunk.toString());
         });
     });
@@ -64,6 +62,5 @@ ipcMain.on('url',function (event, arg) {
     req.on('close', (error) => {
         console.log('Last Transaction has occured')
     });
-    console.log(req);
     req.end();
 });

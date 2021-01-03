@@ -7,24 +7,19 @@ import numpy as np
 
 class Get_elements(Resource):
     def get(self,url):
-        print(url)
         url = url.replace("-","/")
-        print(url)
         url = "https://"+url
-        print(url)
         page = rq.get(url)
         soup = BeautifulSoup(page.content, 'html.parser')
-        print(soup)
-        print()
 
         array = np.array(['html'])
+        x=[{"element": "html"}]
         doc = soup.find_all()
         for n in doc:
             if n.name not in array:
                 array=np.append(array,n.name)
-        array_l= array.tolist()
-        js=json.dumps(array_l)
+                x.append({"element":n.name})
+
+        js=json.dumps(x)
         print(js)
         return js
-
-
