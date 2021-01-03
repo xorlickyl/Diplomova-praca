@@ -31,16 +31,14 @@
         ipcRenderer.send('url', url )
     });
 
-    // ipcRenderer.on('finish',function (event,param){
-    //     console.log("bb");
-    //     setTimeout(function(){
-    //         console.log("aa");
-    //         var p = document.createElement("P");
-    //         p.innerText=param;
-    //         document.getElementById("div").appendChild(p);
-    //     }, 3000);
-    //
-    // })
+    ipcRenderer.on('finished',function (event,param){
+        console.log("bb");
+            console.log("aa");
+            var p = document.createElement("P");
+            p.innerText=param;
+            document.getElementById("div").appendChild(p);
+
+    })
 
 </script>
 </html>

@@ -17,7 +17,7 @@
 </body>
 <script>
     const {ipcRenderer} = require('electron');
-     ipcRenderer.on('finish',function (event,param){
+     ipcRenderer.on('finished',function (event,param){
         console.log("bb");
             console.log("aa");
             var p = document.createElement("P");
