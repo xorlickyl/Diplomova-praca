@@ -3,13 +3,16 @@ const {net, app, BrowserWindow } = require('electron')
 
 function createWindow () {
     const win = new BrowserWindow({
-        width: 1200,
-        height: 900,
+        //width: 1200,
+       // height: 900,
+        show:false,
         webPreferences: {
             nodeIntegration: true
         }
-    })
 
+    })
+    win.maximize();
+    win.show();
     win.loadFile('index.html')
 }
 
