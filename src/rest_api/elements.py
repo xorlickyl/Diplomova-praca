@@ -1,7 +1,7 @@
 import requests as rq
 from bs4 import BeautifulSoup
-import json
-from flask import request
+#import json
+from flask import request, jsonify
 from flask_restful import Resource
 import numpy as np
 
@@ -19,7 +19,7 @@ class Get_elements(Resource):
             if n.name not in array:
                 array=np.append(array,n.name)
                 x.append({"element":n.name})
-
-        js=json.dumps(x)
+        print(len(x))
+        js=jsonify(x)
         print(js)
         return js

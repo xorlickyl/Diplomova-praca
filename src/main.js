@@ -36,6 +36,7 @@ ipcMain.on('url',function (event, arg) {
     console.log( arg );
     var url = arg.substring(8);
     url=url.replace("/","-");
+
     console.log(url);
     const  req = net.request({
         method:'GET',
@@ -47,7 +48,9 @@ ipcMain.on('url',function (event, arg) {
         console.log(response.statusCode)
 
         response.on('data', (chunk) => {
-            event.sender.send("finished",chunk.toString());
+            var json = JSON.parse(chunk);
+            //console.log(json);
+            event.sender.send("finished",json);
         });
     });
     req.on('finish', () => {
