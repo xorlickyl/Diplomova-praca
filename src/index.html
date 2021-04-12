@@ -2,10 +2,11 @@
 <html>
 <head>
     <meta charset="UTF-8">
-    <title>Hello World!</title>
+    <title>Web scraping tool</title>
     <meta http-equiv="Content-Security-Policy" content="script-src 'self' 'unsafe-inline';" />
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css" integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO" crossorigin="anonymous">
- </head>
+    <script src="bot.js"></script>
+</head>
 <body style="background: white;">
 <h3 style="text-align: center">Diplomova praca</h3>
 <div class="row">
@@ -15,6 +16,7 @@
                 <label>Insert scrapping URL:</label>
                 <input type="text" id="url" name="url">
                 <a id="send_url" type="submit" class="btn btn-primary">Send</a>
+                <a id="scrap_url" type="submit" class="btn btn-primary">Scrap</a>
             </div>
         </form>
     </div>
@@ -25,37 +27,53 @@
 </div>
 
 </body>
+
 <script>
-    const {ipcRenderer} = require('electron');
-    const button=document.getElementById('send_url');
-    button.addEventListener('click', function() {
+   const {ipcRenderer} = require('electron');
+   const button=document.getElementById('send_url');
+   const scrap_button = document.getElementById("scrap_url");
+   button.addEventListener('click', function() {
         let url = document.getElementById("url").value;
         // send to main.js
         ipcRenderer.send('url', url )
     });
 
+    scrap_button.addEventListener('click', function() {
+        let url = document.getElementById("url").value;
+        // send to main.js
+        ipcRenderer.send('scrap', url );
+        location.href="scrap.html";
+    });
+
     ipcRenderer.on('finished',function (event,param){
-        for(var i=0; i<param.length;i++) {
-            var id = "row"+i;
+        //html tag
+        var id = "row0";
+        var r = document.createElement("div");
+        r.className="row";
+        r.id=id;
+        r.style.textAlign="center";
+        r.style.paddingLeft="25px";
+        document.getElementById("div").appendChild(r);
+        var a = document.createElement("A");
+        a.innerText=param.element;
+        a.type="button";
+       // a.className="btn btn-outline-dark btn-sm";
+        document.getElementById(id).appendChild(a);
+
+        for(var i=0, j=1; i<param.inner.length;i++, j++) {
+            var id = "row"+j;
             var r = document.createElement("div");
             r.className="row";
             r.id=id;
             r.style.textAlign="center";
             r.style.paddingLeft="25px";
             document.getElementById("div").appendChild(r);
-            /*var a = document.createElement("A");
-            a.innerText = param[i].element;
-            a.style.borderStyle="solid";
-            a.style.borderWidth="1px";
 
-            //a.style.textAlign="center";
-           // a.style.paddingLeft="25px"
-            document.getElementById(id).appendChild(a);*/
-            var but = document.createElement("button");
-            but.innerText=param[i].element;
-            but.type="button";
-            but.className="btn btn-outline-dark";
-            document.getElementById(id).appendChild(but);
+            var a = document.createElement("A");
+            a.innerText=param.inner[i].element;
+            a.type="button";
+            //but.className="btn btn-outline-dark btn-sm";
+            document.getElementById(id).appendChild(a);
         }
     })
 
