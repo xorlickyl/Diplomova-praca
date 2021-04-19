@@ -46,4 +46,4 @@ class Get_elements(Resource):
             return_json = json.dumps(element_json.__dict__)
             return Response(return_json, mimetype='application/json')
         except:
-            return Response("Error", mimetype='application/json')
+            return Response({},status=400, mimetype='application/json')

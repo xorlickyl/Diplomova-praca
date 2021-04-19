@@ -3,7 +3,6 @@ const request = require('request');
 const {dialog} = require('electron');
 const {ipcMain} = require('electron');
 const fs = require('fs');
-var stringify = require('csv-stringify');
 
 const ip='127.0.0.1:5000';
 
@@ -49,8 +48,6 @@ ipcMain.on('url',function (event, arg) {
         var url = arg.substring(7);
         url = url.replace("/", "-");
     }
-
-
     console.log(url);
     const  req = net.request({
         method:'GET',
@@ -60,11 +57,9 @@ ipcMain.on('url',function (event, arg) {
     });
     req.on('response',(response) => {
         console.log(response.statusCode)
-
         response.on('data', (chunk) => {
             var json = JSON.parse(chunk);
-           // console.log(json);
-            event.sender.send("finished",json);
+            event.sender.send("finished", json);
         });
     });
     req.on('finish', () => {

@@ -47,44 +47,40 @@
     ipcRenderer.on('finished',function (event,param){
         //html tag
         tag_arr = [[param.element]];
-
-        for(var i=0; i<param.inner.length; i++){
-            tag_arr[i+1]=[param.inner[i].element];
-            if(param.inner[i].hasOwnProperty("inner")){
-                for(var j=0; j<param.inner[i].inner.length;j++){
-                    tag_arr[i+1].push(param.inner[i].inner[j].element);
+        for (var i = 0; i < param.inner.length; i++) {
+            tag_arr[i + 1] = [param.inner[i].element];
+            if (param.inner[i].hasOwnProperty("inner")) {
+                for (var j = 0; j < param.inner[i].inner.length; j++) {
+                    tag_arr[i + 1].push(param.inner[i].inner[j].element);
                 }
             }
         }
-        console.log(tag_arr);
-        var x=0;
         var ul = document.createElement("ul");
         ul.id = "ul0";
         document.getElementById("div").appendChild(ul);
         var li = document.createElement("li");
-        li.innerText= tag_arr[0][0];
+        li.innerText = tag_arr[0][0];
         document.getElementById("ul0").appendChild(li);
-        for(var i=1; i<tag_arr.length; i++){
+        for (var i = 1; i < tag_arr.length; i++) {
             var ull = document.createElement("ul");
             ull.id = "ul" + i;
             document.getElementById("ul0").appendChild(ull);
             var lii = document.createElement("li");
-            lii.innerText=tag_arr[i][0];
-            document.getElementById("ul"+i).appendChild(lii);
-            if(tag_arr[i].length>1) {
+            lii.innerText = tag_arr[i][0];
+            document.getElementById("ul" + i).appendChild(lii);
+            if (tag_arr[i].length > 1) {
                 var uull = document.createElement("ul");
                 uull.id = "ull" + i;
-                document.getElementById("ul"+i).appendChild(uull);
-                for(var j=1; j<tag_arr[i].length;j++){
+                document.getElementById("ul" + i).appendChild(uull);
+                for (var j = 1; j < tag_arr[i].length; j++) {
                     var llii = document.createElement("li");
-                    llii.innerText=tag_arr[i][j];
-                    document.getElementById("ull"+i).appendChild(llii);
+                    llii.innerText = tag_arr[i][j];
+                    document.getElementById("ull" + i).appendChild(llii);
                 }
             }
-
         }
-
     })
+
 
 
 </script>
