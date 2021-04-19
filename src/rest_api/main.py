@@ -7,8 +7,8 @@ from src.rest_api.scrap import Scrap_page, Download_data
 app = Flask(__name__)
 api = Api(app)
 
-api.add_resource(Get_elements,'/elements/<url>')
-api.add_resource(Scrap_page,'/scrap/<url>')
+api.add_resource(Get_elements,'/elements/<url>/<prefix>')
+api.add_resource(Scrap_page,'/scrap/<url>/<prefix>')
 api.add_resource(Download_data,'/download')
 
 

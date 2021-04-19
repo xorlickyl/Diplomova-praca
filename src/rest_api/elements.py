@@ -24,23 +24,26 @@ def create_json(parent):
 
 
 class Get_elements(Resource):
-    def get(self,url):
+    def get(self,url, prefix):
         url = url.replace("-","/")
-        url = "https://"+url
-        page = rq.get(url)
-        soup = BeautifulSoup(page.content, 'html.parser')
+        url = prefix+"://"+url
+        try:
+            page = rq.get(url)
+            soup = BeautifulSoup(page.content, 'html.parser')
 
-        element_json=Element()
-        inner_json=[]
-        elements = soup.find_all()
+            element_json=Element()
+            inner_json=[]
+            elements = soup.find_all()
 
-        for n in elements:
-            if n.name=="html":
-                element_json.element=n.name
-                element_json.inner=inner_json
-            else:
-                inn=create_json(n)
-                inner_json.append(inn)
+            for n in elements:
+                if n.name=="html":
+                    element_json.element=n.name
+                    element_json.inner=inner_json
+                else:
+                    inn=create_json(n)
+                    inner_json.append(inn)
 
-        return_json = json.dumps(element_json.__dict__)
-        return Response(return_json, mimetype='application/json')
+            return_json = json.dumps(element_json.__dict__)
+            return Response(return_json, mimetype='application/json')
+        except:
+            return Response("Error", mimetype='application/json')

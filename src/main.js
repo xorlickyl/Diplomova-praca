@@ -40,15 +40,23 @@ console.log('Server-side code running');
 
 // receive message from index.html html-tree
 ipcMain.on('url',function (event, arg) {
-    var url = arg.substring(8);
-    url=url.replace("/","-");
+    if(arg.substring(4,5)=="s") {
+        var prefix = arg.substring(0,5);
+        var url = arg.substring(8);
+        url = url.replace("/", "-");
+    }else{
+        var prefix = arg.substring(0,4);
+        var url = arg.substring(7);
+        url = url.replace("/", "-");
+    }
+
 
     console.log(url);
     const  req = net.request({
         method:'GET',
         protocol:'http:',
         host:ip,
-        path:'/elements/'+url
+        path:'/elements/'+url+"/"+prefix
     });
     req.on('response',(response) => {
         console.log(response.statusCode)
@@ -71,19 +79,24 @@ ipcMain.on('url',function (event, arg) {
     req.end();
 });
 
-
 //recieve message from index.html scraping
 ipcMain.on('scrap',function (event, arg) {
-
-    var url = arg.substring(8);
-    url=url.replace("/","-");
+    if(arg.substring(4,5)=="s") {
+        var prefix = arg.substring(0,5);
+        var url = arg.substring(8);
+        url = url.replace("/", "-");
+    }else{
+        var prefix = arg.substring(0,4);
+        var url = arg.substring(7);
+        url = url.replace("/", "-");
+    }
 
     console.log(url);
     const  req = net.request({
         method:'GET',
         protocol:'http:',
         host:ip,
-        path:'/scrap/'+url
+        path:'/scrap/'+url+'/'+prefix
     });
     req.on('response',(response) => {
         console.log(response.statusCode)

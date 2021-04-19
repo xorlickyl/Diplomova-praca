@@ -4,12 +4,9 @@ from flask import request, make_response
 from flask_restful import Resource, reqparse
 import pandas as pd
 import json
-import csv
-
-parser = reqparse.RequestParser()
+from flask import Response
 
 def someThing(elm,data):
-    #global data
     for n in elm:
         if n.name=="html":
             continue
@@ -26,17 +23,20 @@ def someThing(elm,data):
     return data
 
 class Scrap_page(Resource):
-    def get(self,url):
+    def get(self,url,prefix):
         url = url.replace("-","/")
-        url = "https://"+url
-        page = rq.get(url)
-        soup = BeautifulSoup(page.content, 'html.parser')
-        columns =['tag', 'class', 'value']
-        data= pd.DataFrame(columns=columns)
-        data = data.fillna(0)
-        elm =soup.find_all()
-        data = someThing(elm, data)
-        return data.to_json(orient='records')[1:-1].replace('},{', '} {')
+        url = prefix+"://"+url
+        try:
+            page = rq.get(url)
+            soup = BeautifulSoup(page.content, 'html.parser')
+            columns =['tag', 'class', 'value']
+            data= pd.DataFrame(columns=columns)
+            data = data.fillna(0)
+            elm =soup.find_all()
+            data = someThing(elm, data)
+            return data.to_json(orient='records')[1:-1].replace('},{', '} {')
+        except:
+            return Response("Error", mimetype='application/json')
 
 class Download_data(Resource):
     def post(self):
@@ -50,10 +50,6 @@ class Download_data(Resource):
         data = "["+data+"]"
         data = json.loads(data)
         print(data)
-        #df = pd.DataFrame.from_dict(data, orient="index")
-        #df = pd.read_json(data.__dict__,orient='index')
-        #print(df)
-        #df.to_csv("data.csv", index=False)
         columns =['tag', 'class', 'value']
         df= pd.DataFrame(columns=columns)
         for i in data:

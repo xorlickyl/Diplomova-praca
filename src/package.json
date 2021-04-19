@@ -9,6 +9,7 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "jquery": "^3.6.0",
     "python-shell": "^2.0.3",
     "remote": "^0.2.6"
   },

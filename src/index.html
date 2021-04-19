@@ -9,12 +9,12 @@
 <body style="background: white;">
 <h3 style="text-align: center">Diplomova praca</h3>
 <div class="row">
-    <div class="col" style="text-align: center">
+    <div class="col-md-4 offset-md-4" style="text-align: center">
         <form>
             <div class="form-group">
                 <label>Insert scrapping URL:</label>
                 <input type="text" id="url" name="url">
-                <a id="send_url" type="submit" class="btn btn-primary">Send</a>
+                <a id="send_url" type="submit" class="btn btn-primary">Visualize</a>
                 <a id="scrap_url" type="submit" class="btn btn-primary">Scrap</a>
             </div>
         </form>
@@ -22,15 +22,15 @@
 
 </div>
 <div class="row">
-    <div id="div" class="col" style="text-align: center;"></div>
+    <div id="div" class="col-md-4 offset-md-4"></div>
 </div>
 
 </body>
-
 <script>
    const {ipcRenderer} = require('electron');
    const button=document.getElementById('send_url');
    const scrap_button = document.getElementById("scrap_url");
+
    button.addEventListener('click', function() {
         let url = document.getElementById("url").value;
         // send to main.js
@@ -46,35 +46,47 @@
 
     ipcRenderer.on('finished',function (event,param){
         //html tag
-        var id = "row0";
-        var r = document.createElement("div");
-        r.className="row";
-        r.id=id;
-        r.style.textAlign="center";
-        r.style.paddingLeft="25px";
-        document.getElementById("div").appendChild(r);
-        var a = document.createElement("A");
-        a.innerText=param.element;
-        a.type="button";
-       // a.className="btn btn-outline-dark btn-sm";
-        document.getElementById(id).appendChild(a);
+        tag_arr = [[param.element]];
 
-        for(var i=0, j=1; i<param.inner.length;i++, j++) {
-            var id = "row"+j;
-            var r = document.createElement("div");
-            r.className="row";
-            r.id=id;
-            r.style.textAlign="center";
-            r.style.paddingLeft="25px";
-            document.getElementById("div").appendChild(r);
-
-            var a = document.createElement("A");
-            a.innerText=param.inner[i].element;
-            a.type="button";
-            //but.className="btn btn-outline-dark btn-sm";
-            document.getElementById(id).appendChild(a);
+        for(var i=0; i<param.inner.length; i++){
+            tag_arr[i+1]=[param.inner[i].element];
+            if(param.inner[i].hasOwnProperty("inner")){
+                for(var j=0; j<param.inner[i].inner.length;j++){
+                    tag_arr[i+1].push(param.inner[i].inner[j].element);
+                }
+            }
         }
+        console.log(tag_arr);
+        var x=0;
+        var ul = document.createElement("ul");
+        ul.id = "ul0";
+        document.getElementById("div").appendChild(ul);
+        var li = document.createElement("li");
+        li.innerText= tag_arr[0][0];
+        document.getElementById("ul0").appendChild(li);
+        for(var i=1; i<tag_arr.length; i++){
+            var ull = document.createElement("ul");
+            ull.id = "ul" + i;
+            document.getElementById("ul0").appendChild(ull);
+            var lii = document.createElement("li");
+            lii.innerText=tag_arr[i][0];
+            document.getElementById("ul"+i).appendChild(lii);
+            if(tag_arr[i].length>1) {
+                var uull = document.createElement("ul");
+                uull.id = "ull" + i;
+                document.getElementById("ul"+i).appendChild(uull);
+                for(var j=1; j<tag_arr[i].length;j++){
+                    var llii = document.createElement("li");
+                    llii.innerText=tag_arr[i][j];
+                    document.getElementById("ull"+i).appendChild(llii);
+                }
+            }
+
+        }
+
     })
 
+
 </script>
+
 </html>
