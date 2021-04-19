@@ -1,5 +1,11 @@
 const {net, app, BrowserWindow } = require('electron')
+const request = require('request');
+const {dialog} = require('electron');
+const {ipcMain} = require('electron');
+const fs = require('fs');
+var stringify = require('csv-stringify');
 
+const ip='127.0.0.1:5000';
 
 function createWindow () {
     const win = new BrowserWindow({
@@ -7,6 +13,7 @@ function createWindow () {
         height: 900,
         show:false,
         webPreferences: {
+            enableRemoteModule: true,
             nodeIntegration: true
         }
 
@@ -31,11 +38,8 @@ app.on('activate', () => {
 
 console.log('Server-side code running');
 
-const {ipcMain} = require('electron')
-
 // receive message from index.html html-tree
 ipcMain.on('url',function (event, arg) {
-    console.log( arg );
     var url = arg.substring(8);
     url=url.replace("/","-");
 
@@ -43,7 +47,7 @@ ipcMain.on('url',function (event, arg) {
     const  req = net.request({
         method:'GET',
         protocol:'http:',
-        host:'127.0.0.1:5000',
+        host:ip,
         path:'/elements/'+url
     });
     req.on('response',(response) => {
@@ -70,7 +74,7 @@ ipcMain.on('url',function (event, arg) {
 
 //recieve message from index.html scraping
 ipcMain.on('scrap',function (event, arg) {
-    console.log( arg );
+
     var url = arg.substring(8);
     url=url.replace("/","-");
 
@@ -78,7 +82,7 @@ ipcMain.on('scrap',function (event, arg) {
     const  req = net.request({
         method:'GET',
         protocol:'http:',
-        host:'127.0.0.1:5000',
+        host:ip,
         path:'/scrap/'+url
     });
     req.on('response',(response) => {
@@ -86,7 +90,7 @@ ipcMain.on('scrap',function (event, arg) {
 
         response.on('data', (chunk) => {
             var json = JSON.parse(chunk);
-            console.log(json.length);
+            //console.log(json.length);
             event.sender.send("data",json);
         });
     });
@@ -105,34 +109,40 @@ ipcMain.on('scrap',function (event, arg) {
 //recieve message from scrap.html download
 ipcMain.on('download',function (event, arg) {
 
-    const  req = net.request({
-        method:'POST',
-        protocol:'http:',
-        host:'127.0.0.1:5000',
-        path:'/download',
-        headers:{
-            'Content-Type': 'application/json'
-        },
-        body: arg
-    });
-    req.write(arg);
-    req.on('response',(response) => {
-        console.log(response.statusCode)
+//send json for download data
+ request({
+     body: arg,
+     followAllRedirects: true,
+     headers: {'Content-Type': 'application/json',
+                'X-Requested-With': 'XMLHttpRequest'},
+     method: 'POST',
+     url: 'http://'+ip+'/download'}, callback);
 
-        response.on('csv', (chunk) => {
-           // var json = JSON.parse(chunk);
-           // console.log(json.length);
-            event.sender.send("data",chunk);
-        });
-    });
-    req.on('finish', () => {
-        console.log('Request is Finished')
-    });
-    req.on('abort', () => {
-        console.log('Request is Aborted')
-    });
-    req.on('error', (error) => {
-        console.log(`ERROR: ${JSON.stringify(error)}`)
-    });
-    req.end();
+    function callback(error, response, body) {
+        if (!error && response.statusCode == 200) {
+            dialog.showSaveDialog({
+                title: 'Select the File Path to save',
+                buttonLabel: 'Save',
+                filters: [
+                    {
+                        name: 'CSV Files',
+                        extensions: ['csv']
+                    }, ],
+                properties: []
+            }).then(body => {
+                if (!body.canceled) {
+                    fs.writeFile(body.filePath.toString(), response.body, function (err) {
+                        if (err) throw err;
+                        console.log('Saved!');
+                    })
+                }
+            }).catch(err => {
+                console.log(err)
+            });
+
+        } else {
+            console.log("Error: \n"+body);
+        }
+    };
 });
+
