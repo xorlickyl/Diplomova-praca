@@ -6,26 +6,20 @@ import pandas as pd
 import json
 from flask import Response
 
-def someThing(elm,data):
-    for n in elm:
-        if n.name=="html":
-            continue
-        else:
-            ch= n.findChildren()
-            for c in ch:
-                if c.has_attr('content') or c.has_attr('src') or c.has_attr('charset') or c.name=='br'or c.name=='link' or c.name=='script' or c.text==None or c.name=='hr':
-                    continue
-                else:
-                    if c.attrs.get('class') == None:
-                        data=data.append({'tag':c.name, 'value':str(c.text).strip()},ignore_index=True)
-                    else:
-                        data=data.append({'tag':c.name, 'class':c.attrs.get('class'), 'value':str(c.text).strip()},ignore_index=True)
-    return data
+from rest_api.service import createData, checkRobots
+
 
 class Scrap_page(Resource):
     def get(self,url,prefix):
-        url = url.replace("-","/")
+        url= url.replace("X","/")
+        tmp = str(url).find("/")
+        if tmp>0:
+            url_rob = str(url)[0:tmp]
+        else:
+            url_rob=url
+        url_rob=prefix + "://"+url_rob+"/robots.txt"
         url = prefix+"://"+url
+        disallow = checkRobots(url_rob)
         try:
             page = rq.get(url)
             soup = BeautifulSoup(page.content, 'html.parser')
@@ -33,7 +27,7 @@ class Scrap_page(Resource):
             data= pd.DataFrame(columns=columns)
             data = data.fillna(0)
             elm =soup.find_all()
-            data = someThing(elm, data)
+            data = createData(elm, data)
             return data.to_json(orient='records')[1:-1].replace('},{', '} {')
         except:
             return Response("Error", mimetype='application/json')

@@ -39,14 +39,18 @@ console.log('Server-side code running');
 
 // receive message from index.html html-tree
 ipcMain.on('url',function (event, arg) {
+    var url;
     if(arg.substring(4,5)=="s") {
         var prefix = arg.substring(0,5);
-        var url = arg.substring(8);
-        url = url.replace("/", "-");
+        url = arg.substring(8);
+        url = url.replace("/", "X");
     }else{
         var prefix = arg.substring(0,4);
-        var url = arg.substring(7);
-        url = url.replace("/", "-");
+        url = arg.substring(7);
+        url = url.replace("/", "X");
+    }
+    if(url.endsWith("/")){
+        url.replace("/","");
     }
     console.log(url);
     const  req = net.request({
@@ -58,8 +62,11 @@ ipcMain.on('url',function (event, arg) {
     req.on('response',(response) => {
         console.log(response.statusCode)
         response.on('data', (chunk) => {
+            console.log(chunk);
             var json = JSON.parse(chunk);
+            console.log(json);
             event.sender.send("finished", json);
+
         });
     });
     req.on('finish', () => {
@@ -79,11 +86,11 @@ ipcMain.on('scrap',function (event, arg) {
     if(arg.substring(4,5)=="s") {
         var prefix = arg.substring(0,5);
         var url = arg.substring(8);
-        url = url.replace("/", "-");
+        url = url.replace("/", "\\");
     }else{
         var prefix = arg.substring(0,4);
         var url = arg.substring(7);
-        url = url.replace("/", "-");
+        url = url.replace("/", "\\");
     }
 
     console.log(url);
