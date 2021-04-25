@@ -91,7 +91,6 @@ def findElement(soup):
 def dfToJson(df):
     all=""
     for index, r in df.iterrows():
-        print(r)
         row = FullData()
         row.element=r['tag']
         if pd.isnull(r['class'])==False:

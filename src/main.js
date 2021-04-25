@@ -106,7 +106,7 @@ ipcMain.on('scrap',function (event, arg) {
 
         response.on('data', (chunk) => {
             var json = JSON.parse(chunk);
-            console.log(json);
+            //console.log(json);
             event.sender.send("data",json);
         });
     });

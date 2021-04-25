@@ -44,7 +44,6 @@ class Scrap_page(Resource):
                 if tmp_2 not in next_p:
                     next_p.append(tmp_2)
                 next_p.remove("#")
-                print(next_p)
                 for postfix in next_p:
                     page = rq.get(prefix+"://"+main_url+"/"+postfix)
                     soup = BeautifulSoup(page.content, 'html.parser')
@@ -58,6 +57,7 @@ class Scrap_page(Resource):
 class Download_data(Resource):
     def post(self):
         data = request.get_data()
+        print(data)
         if str(data).startswith("b"):
             data = str(data).replace("b","",1)
         data = str(data).replace("'","").replace("\\n","").replace("\\"," ").replace("} {","},{")
