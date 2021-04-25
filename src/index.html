@@ -13,7 +13,9 @@
         <form>
             <div class="form-group">
                 <label>Insert scrapping URL:</label>
-                <input type="text" id="url" name="url">
+                <input type="text" id="url" name="url"><br>
+                <input type="checkbox" id="check" name="check" value="True" checked>
+                <label for="check">Find all subpage</label><br>
                 <a id="send_url" type="submit" class="btn btn-primary">Visualize</a>
                 <a id="scrap_url" type="submit" class="btn btn-primary">Scrap</a>
             </div>
@@ -33,25 +35,29 @@
 
    button.addEventListener('click', function() {
         let url = document.getElementById("url").value;
+        let check = document.getElementById("check").value;
+        var value={url,check};
         // send to main.js
-        ipcRenderer.send('url', url )
+        ipcRenderer.send('url', value )
     });
 
     scrap_button.addEventListener('click', function() {
         let url = document.getElementById("url").value;
+        let check = document.getElementById("check").value;
+        var value = {url, check}
         // send to main.js
-        ipcRenderer.send('scrap', url );
+        ipcRenderer.send('scrap', value);
         location.href="scrap.html";
     });
 
     ipcRenderer.on('finished',function (event,param){
         //html tag
-        tag_arr = [[param.element]];
-        for (var i = 0; i < param.inner.length; i++) {
-            tag_arr[i + 1] = [param.inner[i].element];
-            if (param.inner[i].hasOwnProperty("inner")) {
-                for (var j = 0; j < param.inner[i].inner.length; j++) {
-                    tag_arr[i + 1].push(param.inner[i].inner[j].element);
+        tag_arr = [[param[0].element]];
+        for (var i = 0; i < param[0].inner.length; i++) {
+            tag_arr[i + 1] = [param[0].inner[i].element];
+            if (param[0].inner[i].hasOwnProperty("inner")) {
+                for (var j = 0; j < param[0].inner[i].inner.length; j++) {
+                    tag_arr[i + 1].push(param[0].inner[i].inner[j].element);
                 }
             }
         }

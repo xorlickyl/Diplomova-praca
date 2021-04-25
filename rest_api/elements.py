@@ -4,39 +4,47 @@ from bs4 import BeautifulSoup
 from flask import Response
 from flask_restful import Resource
 
-from rest_api.service import checkRobots, create_json
+from rest_api.service import checkRobots, create_json, findAllUrl, findElement
 
-
-class Element():
-    element=""
-    inner=[]
 
 class Get_elements(Resource):
-    def get(self,url, prefix):
-        url= url.replace("X","/")
+    def get(self, url, prefix,check):
+        url = url.replace("X", "/")
         tmp = str(url).find("/")
-        if tmp>0:
-            url_rob = str(url)[0:tmp]
+        if tmp > 0:
+            main_url = str(url)[0:tmp]
         else:
-            url_rob=url
-        url_rob=prefix + "://"+url_rob+"/robots.txt"
-        url = prefix+"://"+url
+            main_url = url
+        url_rob = prefix + "://" + main_url + "/robots.txt"
         disallow = checkRobots(url_rob)
+        if "*" in disallow:
+            return Response({"Error": "This page can't scrap"}, status=400, mimetype='application/json')
 
         try:
-            page = rq.get(url)
+            url_1 = prefix + "://" + url
+            page = rq.get(url_1)
             soup = BeautifulSoup(page.content, 'html.parser')
-            element_json=Element()
-            inner_json=[]
-            elements = soup.find_all()
-            for n in elements:
-                if n.name=="html":
-                    element_json.element=n.name
-                    element_json.inner=inner_json
-                else:
-                    inn=create_json(n)
-                    inner_json.append(inn)
-            return_json = json.dumps(element_json.__dict__)
-            return Response(return_json, mimetype='application/json')
+            next_p=[]
+            if check=="True":
+                tag_a= soup.find_all("a")
+                next_p=findAllUrl(tag_a,disallow,main_url)
+            if not next_p:
+                return_json = findElement(soup)
+                return Response(return_json, mimetype='application/json')
+            else:
+                tmp_2=str(url)[tmp:len(url)]
+                tmp_2 = tmp_2.replace("/","",1)
+                if tmp_2 not in next_p:
+                    next_p.append(tmp_2)
+                ret=""
+                next_p.remove("#")
+                for postfix in next_p:
+                    page = rq.get(prefix+"://"+main_url+"/"+postfix)
+                    soup = BeautifulSoup(page.content, 'html.parser')
+                    return_json = findElement(soup)
+                    ret = ret+","+str(return_json)
+                ret = ret.replace(",","",1)
+                ret="["+ret+"]"
+                return Response(ret, mimetype='application/json')
         except:
-            return Response({},status=400, mimetype='application/json')
+            return Response({}, status=400, mimetype='application/json')

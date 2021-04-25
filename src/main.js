@@ -39,14 +39,16 @@ console.log('Server-side code running');
 
 // receive message from index.html html-tree
 ipcMain.on('url',function (event, arg) {
+    console.log(arg.url);
+    console.log(arg.check);
     var url;
-    if(arg.substring(4,5)=="s") {
-        var prefix = arg.substring(0,5);
-        url = arg.substring(8);
+    if(arg.url.substring(4,5)=="s") {
+        var prefix = arg.url.substring(0,5);
+        url = arg.url.substring(8);
         url = url.replace("/", "X");
     }else{
-        var prefix = arg.substring(0,4);
-        url = arg.substring(7);
+        var prefix = arg.url.substring(0,4);
+        url = arg.url.substring(7);
         url = url.replace("/", "X");
     }
     if(url.endsWith("/")){
@@ -57,14 +59,13 @@ ipcMain.on('url',function (event, arg) {
         method:'GET',
         protocol:'http:',
         host:ip,
-        path:'/elements/'+url+"/"+prefix
+        path:'/elements/'+url+"/"+prefix+"/"+arg.check
     });
     req.on('response',(response) => {
         console.log(response.statusCode)
         response.on('data', (chunk) => {
-            console.log(chunk);
             var json = JSON.parse(chunk);
-            console.log(json);
+            //console.log(json);
             event.sender.send("finished", json);
 
         });
@@ -83,14 +84,14 @@ ipcMain.on('url',function (event, arg) {
 
 //recieve message from index.html scraping
 ipcMain.on('scrap',function (event, arg) {
-    if(arg.substring(4,5)=="s") {
-        var prefix = arg.substring(0,5);
-        var url = arg.substring(8);
-        url = url.replace("/", "\\");
+    if(arg.url.substring(4,5)=="s") {
+        var prefix = arg.url.substring(0,5);
+        var url = arg.url.substring(8);
+        url = url.replace("/", "X");
     }else{
-        var prefix = arg.substring(0,4);
-        var url = arg.substring(7);
-        url = url.replace("/", "\\");
+        var prefix = arg.url.substring(0,4);
+        var url = arg.url.substring(7);
+        url = url.replace("/", "X");
     }
 
     console.log(url);
@@ -98,14 +99,14 @@ ipcMain.on('scrap',function (event, arg) {
         method:'GET',
         protocol:'http:',
         host:ip,
-        path:'/scrap/'+url+'/'+prefix
+        path:'/scrap/'+url+'/'+prefix+'/'+arg.check
     });
     req.on('response',(response) => {
         console.log(response.statusCode)
 
         response.on('data', (chunk) => {
             var json = JSON.parse(chunk);
-            //console.log(json.length);
+            console.log(json);
             event.sender.send("data",json);
         });
     });
