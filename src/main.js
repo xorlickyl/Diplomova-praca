@@ -132,6 +132,7 @@ ipcMain.on('download',function (event, arg) {
      headers: {'Content-Type': 'application/json',
                 'X-Requested-With': 'XMLHttpRequest'},
      method: 'POST',
+     json: true,
      url: 'http://'+ip+'/download'}, callback);
 
     function callback(error, response, body) {

@@ -96,7 +96,7 @@ def dfToJson(df):
         if pd.isnull(r['class'])==False:
             row.classes=r['class']
         if pd.isnull(r['value'])==False:
-            row.value=str(r['value']).replace('"',"'")
+            row.value=str(r['value']).replace('"',"'").replace("\\n"," ")
         row_json = json.dumps(row.__dict__)
         all=all+","+str(row_json)
     all=all.replace(",","",1)

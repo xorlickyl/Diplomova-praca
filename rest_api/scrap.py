@@ -1,7 +1,7 @@
 import requests as rq
 from bs4 import BeautifulSoup
 from flask import request, make_response
-from flask_restful import Resource, reqparse
+from flask_restful import Resource
 import pandas as pd
 import json
 from flask import Response
@@ -60,17 +60,14 @@ class Download_data(Resource):
         print(data)
         if str(data).startswith("b"):
             data = str(data).replace("b","",1)
-        data = str(data).replace("'","").replace("\\n","").replace("\\"," ").replace("} {","},{")
-        data = data.replace("\"","'")
-        data = data.replace("':'", "\":\"").replace("{'","{\"").replace("'}","\"}").replace("','","\",\"").replace("':['","\":[\"").replace("'],'","\"],\"").replace("':null,'","\":null,\"")
+        data= data.replace("'","").replace("\\n"," ")
         print(data)
-        data = "["+data+"]"
         data = json.loads(data)
         print(data)
         columns =['tag', 'class', 'value']
         df= pd.DataFrame(columns=columns)
         for i in data:
-            df=df.append({'tag':i["tag"],'class':i["class"],'value':i["value"]},ignore_index=True)
+            df=df.append({'tag':i["element"],'class':i["classes"],'value':i["value"]},ignore_index=True)
         output = make_response(df.to_csv())
         output.headers["Content-Disposition"] = "attachment; filename=export.csv"
         output.headers["Content-Type"] = "text/csv"
