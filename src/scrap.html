@@ -9,7 +9,7 @@
 <body style="background: #f9f9f9;text-align: center;">
     <h3>Diplomova praca</h3>
     <div class="row">
-        <div class="col-md-8 offset-md-2">
+        <div id="tab" class="col-md-8 offset-md-2">
             <table id="table" style="text-align: center; border: 1px solid black">
                 <tr>
                     <th style="border: 1px solid black;">Tag</th>
@@ -36,27 +36,33 @@
     var json;
     const {ipcRenderer} = require('electron');
      ipcRenderer.on('data',function (event,param) {
-         json = param;
-         for(var i=0; i<15; i++){
-             if(param[i].value!="") {
-                 var tr = document.createElement("tr");
-                 tr.id = "tbRow" + i;
-                 document.getElementById("table").appendChild(tr);
+         if(param.hasOwnProperty("Error")){
+             var err = document.createElement("h5");
+             err.innerText= param.Error;
+             document.getElementById("tab").appendChild(err);
+         }else {
+             json = param;
+             for (var i = 0; i < 15; i++) {
+                 if (param[i].value != "") {
+                     var tr = document.createElement("tr");
+                     tr.id = "tbRow" + i;
+                     document.getElementById("table").appendChild(tr);
 
-                 var td_1 = document.createElement("td");
-                 td_1.innerText = param[i].element;
-                 td_1.style.borderStyle="solid";
-                 td_1.style.borderColor="black";
-                 td_1.style.borderWidth="1px";
-                 document.getElementById("table").appendChild(td_1);
-                 var td_2 = document.createElement("td");
-                 td_2.innerText = param[i].value;
-                 td_2.style.borderStyle="solid";
-                 td_2.style.borderWidth="1px";
-                 td_2.style.borderColor="black";
-                 document.getElementById("table").appendChild(td_2);
+                     var td_1 = document.createElement("td");
+                     td_1.innerText = param[i].element;
+                     td_1.style.borderStyle = "solid";
+                     td_1.style.borderColor = "black";
+                     td_1.style.borderWidth = "1px";
+                     document.getElementById("table").appendChild(td_1);
+                     var td_2 = document.createElement("td");
+                     td_2.innerText = param[i].value;
+                     td_2.style.borderStyle = "solid";
+                     td_2.style.borderWidth = "1px";
+                     td_2.style.borderColor = "black";
+                     document.getElementById("table").appendChild(td_2);
+                 }
              }
-        }
+         }
     });
 
      const download = document.getElementById("download");

@@ -51,37 +51,43 @@
     });
 
     ipcRenderer.on('finished',function (event,param){
-        //html tag
-        tag_arr = [[param[0].element]];
-        for (var i = 0; i < param[0].inner.length; i++) {
-            tag_arr[i + 1] = [param[0].inner[i].element];
-            if (param[0].inner[i].hasOwnProperty("inner")) {
-                for (var j = 0; j < param[0].inner[i].inner.length; j++) {
-                    tag_arr[i + 1].push(param[0].inner[i].inner[j].element);
+        if(param.hasOwnProperty("Error")){
+            var err = document.createElement("h5");
+            err.innerText= param.Error;
+            document.getElementById("tab").appendChild(err);
+        }else {
+            //html tag
+            tag_arr = [[param[0].element]];
+            for (var i = 0; i < param[0].inner.length; i++) {
+                tag_arr[i + 1] = [param[0].inner[i].element];
+                if (param[0].inner[i].hasOwnProperty("inner")) {
+                    for (var j = 0; j < param[0].inner[i].inner.length; j++) {
+                        tag_arr[i + 1].push(param[0].inner[i].inner[j].element);
+                    }
                 }
             }
-        }
-        var ul = document.createElement("ul");
-        ul.id = "ul0";
-        document.getElementById("div").appendChild(ul);
-        var li = document.createElement("li");
-        li.innerText = tag_arr[0][0];
-        document.getElementById("ul0").appendChild(li);
-        for (var i = 1; i < tag_arr.length; i++) {
-            var ull = document.createElement("ul");
-            ull.id = "ul" + i;
-            document.getElementById("ul0").appendChild(ull);
-            var lii = document.createElement("li");
-            lii.innerText = tag_arr[i][0];
-            document.getElementById("ul" + i).appendChild(lii);
-            if (tag_arr[i].length > 1) {
-                var uull = document.createElement("ul");
-                uull.id = "ull" + i;
-                document.getElementById("ul" + i).appendChild(uull);
-                for (var j = 1; j < tag_arr[i].length; j++) {
-                    var llii = document.createElement("li");
-                    llii.innerText = tag_arr[i][j];
-                    document.getElementById("ull" + i).appendChild(llii);
+            var ul = document.createElement("ul");
+            ul.id = "ul0";
+            document.getElementById("div").appendChild(ul);
+            var li = document.createElement("li");
+            li.innerText = tag_arr[0][0];
+            document.getElementById("ul0").appendChild(li);
+            for (var i = 1; i < tag_arr.length; i++) {
+                var ull = document.createElement("ul");
+                ull.id = "ul" + i;
+                document.getElementById("ul0").appendChild(ull);
+                var lii = document.createElement("li");
+                lii.innerText = tag_arr[i][0];
+                document.getElementById("ul" + i).appendChild(lii);
+                if (tag_arr[i].length > 1) {
+                    var uull = document.createElement("ul");
+                    uull.id = "ull" + i;
+                    document.getElementById("ul" + i).appendChild(uull);
+                    for (var j = 1; j < tag_arr[i].length; j++) {
+                        var llii = document.createElement("li");
+                        llii.innerText = tag_arr[i][j];
+                        document.getElementById("ull" + i).appendChild(llii);
+                    }
                 }
             }
         }
