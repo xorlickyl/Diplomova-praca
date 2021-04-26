@@ -18,7 +18,7 @@ class Get_elements(Resource):
         url_rob = prefix + "://" + main_url + "/robots.txt"
         disallow = checkRobots(url_rob)
         if "*" in disallow:
-            return Response({"Error": "This page can't scrap"}, status=400, mimetype='application/json')
+            return Response({"Error": "This page can't scrap"}, status=200, mimetype='application/json')
 
         try:
             url_1 = prefix + "://" + url
