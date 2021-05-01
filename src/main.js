@@ -36,7 +36,6 @@ app.on('activate', () => {
 })
 
 console.log('Server-side code running');
-
 // receive message from index.html html-tree
 ipcMain.on('url',function (event, arg) {
     console.log(arg.url);
@@ -63,12 +62,17 @@ ipcMain.on('url',function (event, arg) {
     });
     req.on('response',(response) => {
         console.log(response.statusCode)
-        response.on('data', (chunk) => {
-            var json = JSON.parse(chunk);
-            //console.log(json);
-            event.sender.send("finished", json);
+        if(response.statusCode ===200){
+            response.on('data', (chunk) => {
+                var json = JSON.parse(chunk);
+                //console.log(json);
+                event.sender.send("finished", json);
 
-        });
+            });
+        }else{
+            let json = {Error : "Something is wrong"};
+            event.sender.send("finished", json);
+        }
     });
     req.on('finish', () => {
         console.log('Request is Finished')
@@ -103,12 +107,16 @@ ipcMain.on('scrap',function (event, arg) {
     });
     req.on('response',(response) => {
         console.log(response.statusCode)
-
-        response.on('data', (chunk) => {
-            var json = JSON.parse(chunk);
-            //console.log(json);
-            event.sender.send("data",json);
-        });
+        if(response.statusCode===200){
+            response.on('data', (chunk) => {
+                var json = JSON.parse(chunk);
+                //console.log(json);
+                event.sender.send("data",json);
+            });
+        }else{
+            let json = {Error : "Something is wrong"};
+            event.sender.send("finished", json);
+        }
     });
     req.on('finish', () => {
         console.log('Request is Finished')

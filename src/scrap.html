@@ -21,10 +21,10 @@
     </div>
     <div class="row" style="margin-top: 10px">
         <div class="col">
-            <button id="backB" type="button" class="btn btn-primary" style="color: black"><img src="img/back.png" width="25" height="25">Back</button>
+            <button id="backB" type="button" class="btn btn-primary" style="color: black"><img src="img/arrow-left-square.svg" width="25" height="25">Back</button>
         </div>
         <div class="col">
-                <button id="download" type="submit" class="btn btn-primary" style="color: black"><img src="img/download.png" width="25" height="25">Download</button>
+                <button id="download" type="submit" class="btn btn-primary" style="color: black"><img src="img/file-earmark-arrow-down.svg" width="25" height="25">Download</button>
         </div>
     </div>
 </body>
@@ -37,9 +37,7 @@
     const {ipcRenderer} = require('electron');
      ipcRenderer.on('data',function (event,param) {
          if(param.hasOwnProperty("Error")){
-             var err = document.createElement("h5");
-             err.innerText= param.Error;
-             document.getElementById("tab").appendChild(err);
+             alert(param.Error);
          }else {
              json = param;
              for (var i = 0; i < 15; i++) {

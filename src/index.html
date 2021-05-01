@@ -52,9 +52,7 @@
 
     ipcRenderer.on('finished',function (event,param){
         if(param.hasOwnProperty("Error")){
-            var err = document.createElement("h5");
-            err.innerText= param.Error;
-            document.getElementById("tab").appendChild(err);
+            alert(param.Error);
         }else {
             //html tag
             tag_arr = [[param[0].element]];
