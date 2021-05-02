@@ -14,6 +14,7 @@
                 <tr>
                     <th style="border: 1px solid black;">Tag</th>
                     <th style="border: 1px solid black;">Value</th>
+                    <th style="border: 1px solid black">Class</th>
                 </tr>
             </table>
         </div>
@@ -58,6 +59,12 @@
                      td_2.style.borderWidth = "1px";
                      td_2.style.borderColor = "black";
                      document.getElementById("table").appendChild(td_2);
+                     var td_3 = document.createElement("td");
+                     td_3.innerText = param[i].classes;
+                     td_3.style.borderStyle = "solid";
+                     td_3.style.borderWidth = "1px";
+                     td_3.style.borderColor = "black";
+                     document.getElementById("table").appendChild(td_3);
                  }
              }
          }
