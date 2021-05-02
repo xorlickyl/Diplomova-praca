@@ -57,13 +57,11 @@ class Scrap_page(Resource):
 class Download_data(Resource):
     def post(self):
         data = request.get_data()
-        print(data)
+        data=data.decode("utf8")
         if str(data).startswith("b"):
             data = str(data).replace("b","",1)
         data= data.replace("'","").replace("\\n"," ")
-        print(data)
         data = json.loads(data)
-        print(data)
         columns =['tag', 'class', 'value']
         df= pd.DataFrame(columns=columns)
         for i in data:
