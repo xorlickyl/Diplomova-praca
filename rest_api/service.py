@@ -28,12 +28,16 @@ def create_json(parent):
     children = parent.findChildren()
     if (len(children) > 0):
         ejson.element = parent.name
+        if parent.attrs.get('class'):
+            ejson.classes = parent.attrs.get('class')
         ejson.inner = inner
         for c in children:
             inn = create_json(c)
             inner.append(inn)
     else:
         ejson.element = parent.name
+        if parent.attrs.get('class'):
+            ejson.classes = parent.attrs.get('class')
     return ejson.__dict__
 
 def checkRobots(url_robot):

@@ -10,6 +10,10 @@ from rest_api.service import checkRobots, create_json, findAllUrl, findElement
 class Get_elements(Resource):
     def get(self, url, prefix,check):
         url = url.replace("X", "/")
+        if str(url).find("YZ")>0:
+            url = url.replace("YZ","?")
+        if str(url).find("KO")>0:
+            url = url.replace("KO","#")
         tmp = str(url).find("/")
         if tmp > 0:
             main_url = str(url)[0:tmp]
@@ -30,6 +34,8 @@ class Get_elements(Resource):
                 next_p=findAllUrl(tag_a,disallow,main_url)
             if not next_p:
                 return_json = findElement(soup)
+                return_json ="["+return_json+"]"
+                print(return_json)
                 return Response(return_json, mimetype='application/json')
             else:
                 tmp_2=str(url)[tmp:len(url)]

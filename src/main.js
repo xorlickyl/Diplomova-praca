@@ -38,27 +38,28 @@ app.on('activate', () => {
 console.log('Server-side code running');
 // receive message from index.html html-tree
 ipcMain.on('url',function (event, arg) {
-    console.log(arg.url);
-    console.log(arg.check);
     var url;
     if(arg.url.substring(4,5)=="s") {
         var prefix = arg.url.substring(0,5);
         url = arg.url.substring(8);
-        url = url.replace("/", "X");
+        url = url.replaceAll("/", "X");
+        url = url.replaceAll("?", "YZ");
+        url = url.replaceAll("#","KO");
     }else{
         var prefix = arg.url.substring(0,4);
         url = arg.url.substring(7);
-        url = url.replace("/", "X");
+        url = url.replaceAll("/", "X");
+        url = url.replaceAll("?", "YZ");
+        url = url.replaceAll("#","KO");
     }
     if(url.endsWith("/")){
         url.replace("/","");
     }
-    console.log(url);
     const  req = net.request({
         method:'GET',
         protocol:'http:',
         host:ip,
-        path:'/elements/'+url+"/"+prefix+"/"+arg.check
+        path:"/elements/"+url+"/"+prefix+"/"+arg.check
     });
     req.on('response',(response) => {
         console.log(response.statusCode)
@@ -91,11 +92,15 @@ ipcMain.on('scrap',function (event, arg) {
     if(arg.url.substring(4,5)=="s") {
         var prefix = arg.url.substring(0,5);
         var url = arg.url.substring(8);
-        url = url.replace("/", "X");
+        url = url.replaceAll("/", "X");
+        url = url.replaceAll("?", "YZ");
+        url = url.replaceAll("#","KO");
     }else{
         var prefix = arg.url.substring(0,4);
         var url = arg.url.substring(7);
-        url = url.replace("/", "X");
+        url = url.replaceAll("/", "X");
+        url = url.replaceAll("?", "YZ");
+        url = url.replaceAll("#","KO");
     }
 
     console.log(url);
@@ -129,6 +134,26 @@ ipcMain.on('scrap',function (event, arg) {
     });
     req.end();
 });
+//https://android.mpage.sk/index.php
+//recieve message from index.html scraping via tag
+ipcMain.on('scrap_tag',function (event, arg) {
+    console.log(arg);
+    request({
+        body: arg,
+        followAllRedirects: true,
+        headers: {'Content-Type': 'application/json',
+            'X-Requested-With': 'XMLHttpRequest'},
+        method: 'POST',
+        json: true,
+        url: 'http://'+ip+'/scrap/tag'}, callback);
+    function callback(error, response, body) {
+        if (!error && response.statusCode == 200) {
+            var json = JSON.parse(response.body);
+            console.log(json);
+        }
+    }
+});
+
 
 //recieve message from scrap.html download
 ipcMain.on('download',function (event, arg) {

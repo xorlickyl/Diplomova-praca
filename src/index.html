@@ -35,7 +35,12 @@
 
    button.addEventListener('click', function() {
         let url = document.getElementById("url").value;
-        let check = document.getElementById("check").value;
+        const checked = document.querySelectorAll(`input[name="check"]:checked`);
+        if(checked.length>0) {
+            var check = checked.value;
+        }else{
+            var check = "False";
+        }
         var value={url,check};
         // send to main.js
         ipcRenderer.send('url', value )
@@ -50,17 +55,17 @@
         location.href="scrap.html";
     });
 
-    ipcRenderer.on('finished',function (event,param){
-        if(param.hasOwnProperty("Error")){
+    ipcRenderer.on('finished',function (event,param) {
+        if (param.hasOwnProperty("Error")) {
             alert(param.Error);
-        }else {
+        } else {
             //html tag
             tag_arr = [[param[0].element]];
             for (var i = 0; i < param[0].inner.length; i++) {
                 tag_arr[i + 1] = [param[0].inner[i].element];
                 if (param[0].inner[i].hasOwnProperty("inner")) {
                     for (var j = 0; j < param[0].inner[i].inner.length; j++) {
-                        tag_arr[i + 1].push(param[0].inner[i].inner[j].element);
+                        tag_arr[i + 1].push(param[0].inner[i].inner[j].element + " : " + param[0].inner[i].inner[j].classes);
                     }
                 }
             }
@@ -68,14 +73,22 @@
             ul.id = "ul0";
             document.getElementById("div").appendChild(ul);
             var li = document.createElement("li");
-            li.innerText = tag_arr[0][0];
+            var b = document.createElement("button");
+            b.innerText = tag_arr[0][0];
+            b.className = "btn btn-link";
+            b.value=tag_arr[0][0];
+            li.appendChild(b);
             document.getElementById("ul0").appendChild(li);
             for (var i = 1; i < tag_arr.length; i++) {
                 var ull = document.createElement("ul");
                 ull.id = "ul" + i;
                 document.getElementById("ul0").appendChild(ull);
                 var lii = document.createElement("li");
-                lii.innerText = tag_arr[i][0];
+                var bu = document.createElement("button");
+                bu.innerText = tag_arr[i][0];
+                bu.value=tag_arr[i][0];
+                bu.className = "btn btn-link";
+                lii.appendChild(bu);
                 document.getElementById("ul" + i).appendChild(lii);
                 if (tag_arr[i].length > 1) {
                     var uull = document.createElement("ul");
@@ -83,14 +96,27 @@
                     document.getElementById("ul" + i).appendChild(uull);
                     for (var j = 1; j < tag_arr[i].length; j++) {
                         var llii = document.createElement("li");
-                        llii.innerText = tag_arr[i][j];
+                        var but = document.createElement("button");
+                        but.innerText = tag_arr[i][j];
+                        but.className = "btn btn-link";
+                        but.value=tag_arr[i][j];
+                        llii.appendChild(but);
                         document.getElementById("ull" + i).appendChild(llii);
                     }
                 }
             }
         }
-    })
+        buttons = document.querySelectorAll(".btn-link").forEach( butto=>{
+            butto.addEventListener('click', event => {
+                let url = document.getElementById("url").value;
+                let tag = butto.getAttribute("value");
+                var body ={url, tag};
+                ipcRenderer.send('scrap_tag', body);
+                location.href="scrap.html";
+            })
+        })
 
+    })
 
 
 </script>

@@ -71,4 +71,27 @@ class Download_data(Resource):
         output.headers["Content-Type"] = "text/csv"
         return output
 
+class Scrap_from_tag(Resource):
+    def post(self):
+        body= request.get_data()
+        if str(body).startswith("b"):
+            body = str(body).replace("b","",1)
+        if str(body).startswith("'"):
+            body= body.replace("'","")
+        js = json.loads(body)
+        try:
+            page = rq.get(js['url'])
+            soup = BeautifulSoup(page.content, 'html.parser')
+            #href = soup.find_all('a', href=True)
 
+
+            columns =['tag', 'class', 'value']
+            data= pd.DataFrame(columns=columns)
+            data = data.fillna(0)
+            elm =soup.find_all(js['tag'], {"class": js['classes']})
+            data = createData(elm, data)
+            df=dfToJson(data)
+            print(df)
+            return Response(df, mimetype='application/json')
+        except:
+            return Response({},status=400, mimetype='application/json')

@@ -1,5 +1,6 @@
 class Element():
     element = ""
+    classes=""
     inner = []
 
 class FullData():
