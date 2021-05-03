@@ -91,7 +91,6 @@ class Scrap_from_tag(Resource):
             elm =soup.find_all(js['tag'], {"class": js['classes']})
             data = createData(elm, data)
             df=dfToJson(data)
-            print(df)
             return Response(df, mimetype='application/json')
         except:
             return Response({},status=400, mimetype='application/json')

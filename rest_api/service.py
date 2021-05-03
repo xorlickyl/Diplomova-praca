@@ -28,7 +28,9 @@ def create_json(parent):
     children = parent.findChildren()
     if (len(children) > 0):
         ejson.element = parent.name
-        if parent.attrs.get('class'):
+        if parent.attrs.get('class') == None:
+            ejson.classes=""
+        else:
             ejson.classes = parent.attrs.get('class')
         ejson.inner = inner
         for c in children:
@@ -36,7 +38,9 @@ def create_json(parent):
             inner.append(inn)
     else:
         ejson.element = parent.name
-        if parent.attrs.get('class'):
+        if parent.attrs.get('class') == None:
+            ejson.classes=""
+        else:
             ejson.classes = parent.attrs.get('class')
     return ejson.__dict__
 

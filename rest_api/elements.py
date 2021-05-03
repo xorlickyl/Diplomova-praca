@@ -35,7 +35,6 @@ class Get_elements(Resource):
             if not next_p:
                 return_json = findElement(soup)
                 return_json ="["+return_json+"]"
-                print(return_json)
                 return Response(return_json, mimetype='application/json')
             else:
                 tmp_2=str(url)[tmp:len(url)]

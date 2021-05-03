@@ -65,7 +65,11 @@
                 tag_arr[i + 1] = [param[0].inner[i].element];
                 if (param[0].inner[i].hasOwnProperty("inner")) {
                     for (var j = 0; j < param[0].inner[i].inner.length; j++) {
-                        tag_arr[i + 1].push(param[0].inner[i].inner[j].element + " : " + param[0].inner[i].inner[j].classes);
+                        if(param[0].inner[i].inner[j].classes!=="") {
+                            tag_arr[i + 1].push(param[0].inner[i].inner[j].element + " : " + param[0].inner[i].inner[j].classes);
+                        }else {
+                            tag_arr[i + 1].push(param[0].inner[i].inner[j].element);
+                        }
                     }
                 }
             }
