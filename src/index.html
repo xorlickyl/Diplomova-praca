@@ -60,15 +60,14 @@
             alert(param.Error);
         } else {
             //html tag
+            console.log(param[0]);
             tag_arr = [[param[0].element]];
             for (var i = 0; i < param[0].inner.length; i++) {
                 tag_arr[i + 1] = [param[0].inner[i].element];
                 if (param[0].inner[i].hasOwnProperty("inner")) {
                     for (var j = 0; j < param[0].inner[i].inner.length; j++) {
-                        if(param[0].inner[i].inner[j].classes!=="") {
+                        if(param[0].inner[i].inner[j] !==null) {
                             tag_arr[i + 1].push(param[0].inner[i].inner[j].element + " : " + param[0].inner[i].inner[j].classes);
-                        }else {
-                            tag_arr[i + 1].push(param[0].inner[i].inner[j].element);
                         }
                     }
                 }
@@ -113,8 +112,11 @@
         buttons = document.querySelectorAll(".btn-link").forEach( butto=>{
             butto.addEventListener('click', event => {
                 let url = document.getElementById("url").value;
-                let tag = butto.getAttribute("value");
-                var body ={url, tag};
+                let val = butto.getAttribute("value");
+                let val_a = val.split(":")
+                let tag =val_a[0].replace(" ","")
+                let classes=val_a[1].replace(" ","")
+                var body ={url, tag, classes};
                 ipcRenderer.send('scrap_tag', body);
                 location.href="scrap.html";
             })

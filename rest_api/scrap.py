@@ -82,7 +82,7 @@ class Scrap_from_tag(Resource):
         try:
             page = rq.get(js['url'])
             soup = BeautifulSoup(page.content, 'html.parser')
-            #href = soup.find_all('a', href=True)
+            href = soup.find_all('a', href=True)
 
 
             columns =['tag', 'class', 'value']

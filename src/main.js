@@ -66,7 +66,7 @@ ipcMain.on('url',function (event, arg) {
         if(response.statusCode ===200){
             response.on('data', (chunk) => {
                 var json = JSON.parse(chunk);
-                //console.log(json);
+                console.log(json);
                 event.sender.send("finished", json);
 
             });
@@ -115,7 +115,7 @@ ipcMain.on('scrap',function (event, arg) {
         if(response.statusCode===200){
             response.on('data', (chunk) => {
                 var json = JSON.parse(chunk);
-                //console.log(json);
+               // console.log(json);
                 event.sender.send("data",json);
             });
         }else{

@@ -2,7 +2,7 @@ import json
 import requests as rq
 from rest_api.objekt import Element, FullData
 import pandas as pd
-
+disall = ["link", "meta", "head", "script", "title", "br", "hr","button"]
 
 def createData(elm, data):
     for n in elm:
@@ -12,7 +12,7 @@ def createData(elm, data):
             ch = n.findChildren()
             for c in ch:
                 if c.has_attr('content') or c.has_attr('src') or c.has_attr(
-                        'charset') or c.name == 'br' or c.name == 'link' or c.name == 'script' or c.text == None or c.name == 'hr':
+                        'charset') or c.name in disall or c.text == None:
                     continue
                 else:
                     if c.attrs.get('class') == None:
@@ -23,26 +23,29 @@ def createData(elm, data):
     return data
 
 def create_json(parent):
-    ejson = Element()
-    inner = []
-    children = parent.findChildren()
-    if (len(children) > 0):
-        ejson.element = parent.name
-        if parent.attrs.get('class') == None:
-            ejson.classes=""
-        else:
-            ejson.classes = parent.attrs.get('class')
-        ejson.inner = inner
-        for c in children:
-            inn = create_json(c)
-            inner.append(inn)
+    if parent.name in disall:
+        pass
     else:
-        ejson.element = parent.name
-        if parent.attrs.get('class') == None:
-            ejson.classes=""
+        ejson = Element()
+        inner = []
+        children = parent.findChildren()
+        if (len(children) > 0):
+            ejson.element = parent.name
+            if parent.attrs.get('class') == None:
+                ejson.classes=""
+            else:
+                ejson.classes = parent.attrs.get('class')
+            ejson.inner = inner
+            for c in children:
+                inn = create_json(c)
+                inner.append(inn)
         else:
-            ejson.classes = parent.attrs.get('class')
-    return ejson.__dict__
+            ejson.element = parent.name
+            if parent.attrs.get('class') == None:
+                ejson.classes=""
+            else:
+                ejson.classes = parent.attrs.get('class')
+        return ejson.__dict__
 
 def checkRobots(url_robot):
     robots = rq.get(url_robot)
@@ -92,8 +95,9 @@ def findElement(soup):
             element_json.inner = inner_json
         else:
             inn = create_json(n)
-            inner_json.append(inn)
-    return_json = json.dumps(element_json.__dict__)
+            if inn is not None:
+                inner_json.append(inn)
+        return_json = json.dumps(element_json.__dict__)
     return return_json
 
 def dfToJson(df):
