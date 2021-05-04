@@ -2,24 +2,53 @@ import json
 import requests as rq
 from rest_api.objekt import Element, FullData
 import pandas as pd
-disall = ["link", "meta", "head", "script", "title", "br", "hr","button"]
+import numpy as np
+disall = ["link", "meta", "head", "script", "title", "br", "hr","button", "picture", "svg", "use"]
 
-def createData(elm, data):
+def createData(elm):
+    data= pd.DataFrame(columns=["id"])
+    data=data.fillna(0)
     for n in elm:
+        i=0
         if n.name == "html":
             continue
         else:
+            tmp ="N"
+            values = []
+            classes =[]
             ch = n.findChildren()
             for c in ch:
                 if c.has_attr('content') or c.has_attr('src') or c.has_attr(
-                        'charset') or c.name in disall or c.text == None:
+                        'charset') or c.name in disall or (len(str(c.text).strip()))==0:
                     continue
                 else:
+                    if str(c.text).strip() not in tmp:
+                        tmp = str(c.text).strip()
+                        if values!=[] and classes!=[]:
+                            l=len(data)
+                            data.at[l,"id"]=i
+                            for x,v in zip(classes,values):
+                                if x not in data.columns:
+                                    data[x]=np.nan
+                                data.loc[l,x]=v
+                        values=[]
+                        classes=[]
+                        i=i+1
+                        continue
                     if c.attrs.get('class') == None:
-                        data = data.append({'tag': c.name, 'class':"", 'value': str(c.text).strip()}, ignore_index=True)
+                        string = str(c.text).strip()
+                        if string in values:
+                            values.append(string)
+                            classes.append(" ")
                     else:
-                        data = data.append({'tag': c.name, 'class': str(c.attrs.get('class')), 'value': str(c.text).strip()},
-                                           ignore_index=True)
+                        string = str(c.text).strip()
+                        if string in values:
+                            x = values.index(string)
+                            classes[x]=str(c.attrs.get('class'))
+                        else:
+                            values.append(string)
+                            classes.append(str(c.attrs.get('class')))
+    data.to_csv("xxx.csv")
     return data
 
 def create_json(parent):

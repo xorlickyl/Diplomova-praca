@@ -83,14 +83,14 @@ class Scrap_from_tag(Resource):
             page = rq.get(js['url'])
             soup = BeautifulSoup(page.content, 'html.parser')
             href = soup.find_all('a', href=True)
-
-
-            columns =['tag', 'class', 'value']
-            data= pd.DataFrame(columns=columns)
-            data = data.fillna(0)
+            pages=[]
+            for h in href:
+                if str(h.attrs.get("href")).find("page")>0:
+                    pages.append(str(h.attrs.get("href")))
+            print(pages)
             elm =soup.find_all(js['tag'], {"class": js['classes']})
-            data = createData(elm, data)
-            df=dfToJson(data)
-            return Response(df, mimetype='application/json')
+            data = createData(elm)
+            #df=dfToJson(data)
+            return Response({}, mimetype='application/json')
         except:
             return Response({},status=400, mimetype='application/json')
