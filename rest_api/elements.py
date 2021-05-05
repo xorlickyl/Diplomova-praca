@@ -14,6 +14,7 @@ class Get_elements(Resource):
             url = url.replace("YZ","?")
         if str(url).find("KO")>0:
             url = url.replace("KO","#")
+        print(url)
         tmp = str(url).find("/")
         if tmp > 0:
             main_url = str(url)[0:tmp]
