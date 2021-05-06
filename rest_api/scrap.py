@@ -5,6 +5,7 @@ from flask_restful import Resource
 import pandas as pd
 import json
 from flask import Response
+import numpy as np
 
 from rest_api.service import createData, checkRobots, findAllUrl, dfToJson
 
@@ -71,6 +72,7 @@ class Download_data(Resource):
         output.headers["Content-Type"] = "text/csv"
         return output
 
+
 class Scrap_from_tag(Resource):
     def post(self):
         body= request.get_data()
@@ -87,10 +89,38 @@ class Scrap_from_tag(Resource):
             for h in href:
                 if str(h.attrs.get("href")).find("page")>0:
                     pages.append(str(h.attrs.get("href")))
-            print(pages)
             elm =soup.find_all(js['tag'], {"class": js['classes']})
             data = createData(elm)
-            #df=dfToJson(data)
-            return Response({}, mimetype='application/json')
+            next_page= pages[len(pages)-1]
+            while next_page != "#":
+                url = str(js['url'])
+                if url.startswith("https"):
+                    tmp = str(url).find("/",9,len(url))
+                    if tmp > 0:
+                        url = str(url)[0:tmp]
+                elif url.startswith("http"):
+                    tmp = str(url).find("/",8,len(url))
+                    if tmp > 0:
+                        url = str(url)[0:tmp]
+                next_p = url+next_page
+                page = rq.get(next_p)
+                soup = BeautifulSoup(page.content, 'html.parser')
+                elm =soup.find_all(js['tag'], {"class": js['classes']})
+                d= createData(elm)
+                for index, row in d.iterrows():
+                    l = len(data)
+                    row["id"]=l+1
+                    data= data.append(row, ignore_index=True)
+                href = soup.find_all('a', href=True)
+                pages=[]
+                for h in href:
+                    if str(h.attrs.get("href")).find("page")>0 or str(h.attrs.get("href"))=="#":
+                        pages.append(str(h.attrs.get("href")))
+                next_page= pages[len(pages)-1]
+            data.drop(" ", inplace=True, axis=1)
+            data = data.loc[:,data.isin(["",None,"NULL","null",0,np.nan]).mean()<.6]
+            data.to_csv("test.csv")
+            df=dfToJson(data)
+            return Response(df, mimetype='application/json')
         except:
             return Response({},status=400, mimetype='application/json')

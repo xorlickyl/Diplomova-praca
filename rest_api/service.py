@@ -48,7 +48,6 @@ def createData(elm):
                         else:
                             values.append(string)
                             classes.append(str(c.attrs.get('class')))
-    data.to_csv("xxx.csv")
     return data
 
 def create_json(parent):
@@ -130,16 +129,17 @@ def findElement(soup):
     return return_json
 
 def dfToJson(df):
-    all=""
-    for index, r in df.iterrows():
-        row = FullData()
-        row.element=r['tag']
-        if pd.isnull(r['class'])==False:
-            row.classes=r['class']
-        if pd.isnull(r['value'])==False:
-            row.value=str(r['value']).replace('"',"'").replace("\\n"," ")
-        row_json = json.dumps(row.__dict__)
-        all=all+","+str(row_json)
-    all=all.replace(",","",1)
-    all="["+all+"]"
+    all=[]
+    col = df.columns
+    for index,r in df.iterrows():
+        row ={}
+        print(row)
+        for c in col:
+            print(c,r[c])
+            if r[c] not in ["",None,"NULL","null",0,np.nan]:
+                row[c]= r[c]
+            else:
+                row[c]=""
+        all.append(row)
+    all=json.dumps(all)
     return all
