@@ -1,10 +1,27 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <title>Web scraping tool</title>
     <meta http-equiv="Content-Security-Policy" content="script-src 'self' 'unsafe-inline';" />
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css" integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO" crossorigin="anonymous">
+    <style>
+        .loader {
+            border: 16px solid #f3f3f3;
+            border-radius: 50%;
+            border-top: 16px solid #3498db;
+            width: 120px;
+            height: 120px;
+            animation: spin 2s linear infinite;
+            position: fixed;
+            left: 50%;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
 </head>
 <body style="background: #f9f9f9;">
 <h3 style="text-align: center">Diplomova praca</h3>
@@ -15,7 +32,7 @@
                 <label>Insert scrapping URL:</label>
                 <input type="text" id="url" name="url"><br>
                 <input type="checkbox" id="check" name="check" value="True" checked>
-                <label for="check">Find all subpage</label><br>
+                <label for="check">Find all subpages</label><br>
                 <a id="send_url" type="submit" class="btn btn-primary">Visualize</a>
                 <a id="scrap_url" type="submit" class="btn btn-primary">Scrap</a>
             </div>
@@ -24,7 +41,10 @@
 
 </div>
 <div class="row">
-    <div id="div" class="col-md-4 offset-md-4"></div>
+    <div class="col-md-4 offset-md-4">
+        <div id="loader"></div>
+        <div id="div"></div>
+    </div>
 </div>
 
 </body>
@@ -36,14 +56,20 @@
    button.addEventListener('click', function() {
         let url = document.getElementById("url").value;
         const checked = document.querySelectorAll(`input[name="check"]:checked`);
+        var check;
         if(checked.length>0) {
-            var check = checked.value;
+            check = checked.value;
         }else{
-            var check = "False";
+            check = "False";
         }
         var value={url,check};
         // send to main.js
-        ipcRenderer.send('url', value )
+       if(url.length>0) {
+           document.getElementById("loader").className = "loader";
+           ipcRenderer.send('url', value);
+       }else{
+           alert("URL is empty, please input URL")
+       }
     });
 
     scrap_button.addEventListener('click', function() {
@@ -51,27 +77,69 @@
         let check = document.getElementById("check").value;
         var value = {url, check}
         // send to main.js
-        ipcRenderer.send('scrap', value);
-        location.href="scrap.html";
+        if(url.length>0) {
+            ipcRenderer.send('scrap', value);
+            location.href="scrap.html";
+        }else{
+           alert("URL is empty, please input URL")
+       }
     });
 
     ipcRenderer.on('finished',function (event,param) {
         if (param.hasOwnProperty("Error")) {
             alert(param.Error);
+            document.getElementById("loader").remove();
         } else {
             //html tag
-            console.log(param[0]);
-            tag_arr = [[param[0].element]];
-            for (var i = 0; i < param[0].inner.length; i++) {
-                tag_arr[i + 1] = [param[0].inner[i].element];
-                if (param[0].inner[i].hasOwnProperty("inner")) {
-                    for (var j = 0; j < param[0].inner[i].inner.length; j++) {
-                        if(param[0].inner[i].inner[j] !==null) {
-                            tag_arr[i + 1].push(param[0].inner[i].inner[j].element + " : " + param[0].inner[i].inner[j].classes);
+            //tag_arr = [param.element];
+            console.log(param);
+            var ul = document.createElement("ul");
+            ul.className="ul"+param[0].inner;
+            var li = document.createElement("li");
+            var b =document.createElement("button");
+            b.innerText = param[0].element;
+            b.className = "btn btn-link";
+            b.value = param[0].element;
+            li.appendChild(b);
+            ul.appendChild(li);
+            document.getElementById("div").appendChild(ul);
+            for(var i =1; i<param.length;i++){
+                //if(document.getElementsByClassName("ul"+param[i].inner).length==0) {
+                   // if (document.getElementsByClassName("ul" + (param[i].inner - 1)).length != 0) {
+                        var ul_1 = document.createElement("ul");
+                        ul_1.className = "ul" + param[i].inner;
+                        var li_1 = document.createElement("li");
+                        var b = document.createElement("button");
+                        b.innerText = param[i].element + " : " + param[i].classes.toString();
+                        b.className = "btn btn-link";
+                        b.value = param[i].element + " : " + param[i].classes.toString();
+                        li_1.appendChild(b);
+                        ul_1.appendChild(li_1);
+                        var par=document.getElementsByClassName("ul" + (param[i].inner - 1));
+                        console.log(par.length);
+                        par.item(par.length-1).appendChild(ul_1);
+                 //   }
+               // }//else{
+
+               // }
+            }
+            document.getElementById("loader").remove();
+            /*if(param.hasOwnProperty("inner") && param.inner.length>0) {
+                for (var i = 0; i < param[0].inner.length; i++) {
+                    tag_arr[i + 1] = [param[0].inner[i].element];
+                    if (param[0].inner[i].hasOwnProperty("inner")) {
+                        if (param[0].inner[i].inner.length > 0) {
+                            for (var j = 0; j < param[0].inner[i].inner.length; j++) {
+                                if (param[0].inner[i].inner[j] !== null && param[0].inner[i].inner[j].length > 0) {
+                                    tag_arr[i + 1].push(param.inner[i].inner[j].element + " : " + param.inner[i].inner[j].classes);
+                                }
+                            }
                         }
                     }
                 }
-            }
+            }*/
+            /*
+        if(tag_arr.length>0) {
             var ul = document.createElement("ul");
             ul.id = "ul0";
             document.getElementById("div").appendChild(ul);
@@ -79,17 +147,17 @@
             var b = document.createElement("button");
             b.innerText = tag_arr[0][0];
             b.className = "btn btn-link";
-            b.value=tag_arr[0][0];
+            b.value = tag_arr[0][0];
             li.appendChild(b);
             document.getElementById("ul0").appendChild(li);
             for (var i = 1; i < tag_arr.length; i++) {
                 var ull = document.createElement("ul");
                 ull.id = "ul" + i;
-                document.getElementById("ul0").appendChild(ull);
+                ul.appendChild(ull);
                 var lii = document.createElement("li");
                 var bu = document.createElement("button");
                 bu.innerText = tag_arr[i][0];
-                bu.value=tag_arr[i][0];
+                bu.value = tag_arr[i][0];
                 bu.className = "btn btn-link";
                 lii.appendChild(bu);
                 document.getElementById("ul" + i).appendChild(lii);
@@ -102,15 +170,18 @@
                         var but = document.createElement("button");
                         but.innerText = tag_arr[i][j];
                         but.className = "btn btn-link";
-                        but.value=tag_arr[i][j];
+                        but.value = tag_arr[i][j];
                         llii.appendChild(but);
                         document.getElementById("ull" + i).appendChild(llii);
                     }
                 }
             }
+            document.getElementById("loader").remove();
+        }*/
+
         }
         buttons = document.querySelectorAll(".btn-link").forEach( butto=>{
-            butto.addEventListener('click', event => {
+            butto.addEventListener('click', () => {
                 let url = document.getElementById("url").value;
                 let val = butto.getAttribute("value");
                 let val_a = val.split(":")

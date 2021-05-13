@@ -1,26 +1,42 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Hello World!</title>
     <meta http-equiv="Content-Security-Policy" content="script-src 'self' 'unsafe-inline';" />
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css" integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO" crossorigin="anonymous">
+    <style>
+        #loader {
+            border: 16px solid #f3f3f3;
+            border-radius: 50%;
+            border-top: 16px solid #3498db;
+            width: 120px;
+            height: 120px;
+            animation: spin 2s linear infinite;
+            position: fixed;
+            left: 50%;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        table, td, th {
+            border: 1px solid black;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+    </style>
 </head>
 <body style="background: #f9f9f9;text-align: center;">
     <h3>Diplomova praca</h3>
-    <div class="row">
-        <div id="tab" class="col-md-8 offset-md-2">
-            <table id="table" style="text-align: center; border: 1px solid black">
-                <tr>
-                    <th style="border: 1px solid black;">Tag</th>
-                    <th style="border: 1px solid black;">Value</th>
-                    <th style="border: 1px solid black">Class</th>
-                </tr>
-            </table>
+    <div class="row" id="frow" style="margin-top: 10px; height: 430px;">
+        <div class="col-md-10 offset-md-1">
+            <div id="loader" style="text-align: center;"></div>
+            <div id="tab"></div>
         </div>
-
     </div>
-    <div class="row" style="margin-top: 10px">
+    <div class="row">
         <div class="col">
             <button id="backB" type="button" class="btn btn-primary" style="color: black"><img src="img/arrow-left-square.svg" width="25" height="25">Back</button>
         </div>
@@ -30,51 +46,55 @@
     </div>
 </body>
 <script>
+    const {ipcRenderer} = require('electron');
     const backButton = document.getElementById("backB");
     backButton.addEventListener('click', function (){
         location.href="index.html";
-    })
-    var json;
-    const {ipcRenderer} = require('electron');
-     ipcRenderer.on('data',function (event,param) {
-         if(param.hasOwnProperty("Error")){
-             alert(param.Error);
-         }else {
-             json = param;
-             for (var i = 0; i < 15; i++) {
-                 if (param[i].value != "") {
-                     var tr = document.createElement("tr");
-                     tr.id = "tbRow" + i;
-                     document.getElementById("table").appendChild(tr);
+    });
+    var data;
 
-                     var td_1 = document.createElement("td");
-                     td_1.innerText = param[i].element;
-                     td_1.style.borderStyle = "solid";
-                     td_1.style.borderColor = "black";
-                     td_1.style.borderWidth = "1px";
-                     document.getElementById("table").appendChild(td_1);
-                     var td_2 = document.createElement("td");
-                     td_2.innerText = param[i].value;
-                     td_2.style.borderStyle = "solid";
-                     td_2.style.borderWidth = "1px";
-                     td_2.style.borderColor = "black";
-                     document.getElementById("table").appendChild(td_2);
-                     var td_3 = document.createElement("td");
-                     td_3.innerText = param[i].classes;
-                     td_3.style.borderStyle = "solid";
-                     td_3.style.borderWidth = "1px";
-                     td_3.style.borderColor = "black";
-                     document.getElementById("table").appendChild(td_3);
-                 }
-             }
-         }
+    ipcRenderer.on('data', function (event,param) {
+        if(param.hasOwnProperty("Error")){
+            document.getElementById("loader").remove();
+            alert(param.Error);
+        }else{
+            data= param;
+            var col = [];
+            for (var i = 0; i < 5; i++) {
+                for (var key in data[i]) {
+                    if (col.indexOf(key) === -1) {
+                        col.push(key);
+                    }
+                }
+            }
+            var table = document.createElement("table");
+            var tr = table.insertRow(-1);
+            for (var i = 0; i < col.length; i++) {
+                var th = document.createElement("th");
+                th.innerHTML = col[i];
+                tr.appendChild(th);
+            }
+            for (var i = 0; i < 10; i++) {
+                tr = table.insertRow(-1);
+                for (var j = 0; j < col.length; j++) {
+                    var tabCell = tr.insertCell(-1);
+                    tabCell.innerHTML = data[i][col[j]];
+                }
+            }
+            document.getElementById("loader").remove();
+            var divShowData = document.getElementById('tab');
+            divShowData.innerHTML = "";
+            divShowData.appendChild(table);
+            let h = divShowData.clientHeight;
+            console.log(h);
+            document.getElementById("frow").style.height=h;
+        }
     });
 
      const download = document.getElementById("download");
      download.addEventListener('click', function (){
-         console.log(json);
-         ipcRenderer.send('download', json);
-     })
+         ipcRenderer.send('download', data);
+     });
 
 </script>
 </html>

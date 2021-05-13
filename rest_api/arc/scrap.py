@@ -7,7 +7,7 @@ import json
 from flask import Response
 import numpy as np
 
-from rest_api.service import createData, checkRobots, findAllUrl, dfToJson, createDataTag
+from service import createData, checkRobots, findAllUrl, dfToJson, createDataTag
 
 
 class Scrap_page(Resource):
@@ -122,9 +122,7 @@ class Scrap_from_tag(Resource):
                 next_page= pages[len(pages)-1]
             data.drop(" ", inplace=True, axis=1)
             data = data.loc[:,data.isin(["",None,"NULL","null",0,np.nan]).mean()<.6]
-            #data.to_csv("test.csv")
             df=dfToJson(data)
-
             return Response(df, mimetype='application/json')
         except:
             return Response({},status=400, mimetype='application/json')

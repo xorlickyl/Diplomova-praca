@@ -1,9 +1,5 @@
 class Element():
     element = ""
     classes=""
-    inner = []
+    inner = ""
 
-class FullData():
-    element=""
-    classes=""
-    value=""

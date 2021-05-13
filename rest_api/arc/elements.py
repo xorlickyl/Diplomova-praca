@@ -5,8 +5,7 @@ from flask import Response
 from flask_restful import Resource
 
 
-from rest_api.service import checkRobots, create_json, findAllUrl, findElement
-
+from service import checkRobots, create_json, findAllUrl, findElement
 
 class Get_elements(Resource):
     def get(self, url, prefix,check):
@@ -36,7 +35,7 @@ class Get_elements(Resource):
                 next_p=findAllUrl(tag_a,disallow,main_url)
             if next_p==[]:
                 return_json = findElement(soup)
-                print(return_json)
+                #return_json=return_json.replace('inner":[','inner":{').replace(']},','}},')
                 return Response(return_json, mimetype='application/json')
             else:
                 tmp_2=str(url)[tmp:len(url)]

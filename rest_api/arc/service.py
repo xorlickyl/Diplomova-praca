@@ -1,6 +1,6 @@
 import json
 import requests as rq
-from rest_api.objekt import Element
+from objekt import Element, FullData
 import pandas as pd
 import numpy as np
 disall = ["link", "meta", "head", "script", "title", "br", "hr", "button", "picture", "svg", "use", "iframe", "header", "aside", "footer", "nav", "input", "noscript", "img"]
@@ -35,6 +35,8 @@ def createData(elm):
                         i=i+1
 
     return data
+
+
 
 def createDataTag(elm):
     data= pd.DataFrame(columns=["id"])
@@ -81,37 +83,31 @@ def createDataTag(elm):
                             classes.append(str(c.attrs.get('class')))
     return data
 
-def create_json(parent, ins):
-    js=''
-    if parent.name in disall or parent.attrs.get('class') == None or str(parent.attrs.get('class')).find("nav")>0 or str(parent.attrs.get('class')).find("footer")>0 or str(parent.attrs.get('class')).find("error-message")>0  or str(parent.attrs.get('class')).find("logo")>0 \
-            or str(parent.attrs.get('class')).find("sidebar")>0 or str(parent.attrs.get('class')).find("left_menu")>0 or str(parent.attrs.get('class')).find("hidden")>0 or str(parent.attrs.get('class')).find("breadcrumb")>0 or str(parent.attrs.get('class')).find("popoffer-close")>0:
+def create_json(parent):
+    if parent.name in disall or parent.attrs.get('class') == None:
         pass
     else:
         ejson = Element()
+        inner = []
         children = parent.findChildren()
         if (len(children) > 0):
             ejson.element = parent.name
-            ejson.classes = parent.attrs.get('class')
-            ejson.inner = ins
-            if js not in ["",None,"NULL","null",0,np.nan]:
-                js= js+","+(str(ejson.__dict__))
+            if parent.attrs.get('class') == None:
+                ejson.classes=""
             else:
-                js= (str(ejson.__dict__))
+                ejson.classes = parent.attrs.get('class')
+            ejson.inner = inner
             for c in children:
-                inn = create_json(c, ins+1)
+                inn = create_json(c)
                 if inn not in ["",None,"NULL","null",0,np.nan]:
-                    js= js+","+(str(inn))
+                    inner.append(inn)
         else:
             ejson.element = parent.name
-            ejson.classes = parent.attrs.get('class')
-            ejson.inner=ins
-            if js not in ["",None,"NULL","null",0,np.nan]:
-                js= js+","+(str(ejson.__dict__))
+            if parent.attrs.get('class') == None:
+                ejson.classes=""
             else:
-                js= (str(ejson.__dict__))
-        print(js)
-
-        return js
+                ejson.classes = parent.attrs.get('class')
+        return ejson.__dict__
 
 def checkRobots(url_robot):
     robots = rq.get(url_robot)
@@ -153,19 +149,17 @@ def findAllUrl(tag_a,disallow,main_url):
 
 def findElement(soup):
     element_json = Element()
-    final=''
+    inner_json = []
     elements = soup.find_all()
     for n in elements:
         if n.name == "html":
             element_json.element = n.name
-            element_json.inner = 0
-            final= (str(element_json.__dict__))
+            element_json.inner = inner_json
         else:
-            inn = create_json(n,1)
+            inn = create_json(n)
             if inn is not None:
-                final= final+","+(str(inn))
-        return_json="["+final+"]"
-        return_json = json.dumps(return_json)
+                inner_json.append(inn)
+        return_json = json.dumps(element_json.__dict__)
     return return_json
 
 def dfToJson(df):
